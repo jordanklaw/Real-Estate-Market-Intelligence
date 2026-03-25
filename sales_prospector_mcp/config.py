@@ -3,6 +3,10 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Base paths
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -72,7 +76,7 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
 NEWS_CACHE_MAX_AGE_HOURS = 24
 
 # Daily brief settings
-DAILY_BRIEF_RECIPIENT = "jordan.k.law@gmail.com"
+DAILY_BRIEF_RECIPIENT = os.environ.get("DAILY_BRIEF_RECIPIENT", "")
 DAILY_BRIEF_TOP_N = 5
 
 # Deal stage weights for scoring

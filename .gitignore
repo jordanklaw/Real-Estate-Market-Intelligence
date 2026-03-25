@@ -4,3 +4,4 @@ venv/
 .env
 token.json
 credentials.json
+briefs/

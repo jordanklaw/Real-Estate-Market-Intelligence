@@ -32,6 +32,7 @@ STATE_NAMES = {
     "wisconsin": "WI", "wyoming": "WY",
 }
 
+# Major cities to state mapping for region detection.
 # Keep keys unique; ambiguous city names are handled in CITY_STATE_PATTERNS.
 CITY_TO_STATE = {
     "new york": "NY", "manhattan": "NY", "brooklyn": "NY", "queens": "NY",
@@ -91,12 +92,12 @@ def detect_regions(text: str) -> list[dict]:
             found.append({"state": abbr, "region": STATE_TO_REGION[abbr]})
             seen_states.add(abbr)
 
-    # Check state abbreviations (with word boundaries)
+    # Check state abbreviations (with word boundaries), case-insensitive.
     for region, states in TERRITORY_REGIONS.items():
         for state in states:
             if state in EXCLUDED_STATES or state in seen_states:
                 continue
-            if re.search(rf'\b{state}\b', text):
+            if re.search(rf"\b{re.escape(state)}\b", text, flags=re.IGNORECASE):
                 found.append({"state": state, "region": region})
                 seen_states.add(state)
 

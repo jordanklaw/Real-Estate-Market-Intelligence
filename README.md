@@ -1,4 +1,4 @@
-# Real Estate Market Intelligence
+# Real Estate Market Intelligence MCP
 
 A local-first sales intelligence system built on the Model Context Protocol (MCP), designed for commercial and multifamily real estate software sales. The system scrapes industry news, matches signals to accounts by territory and urgency, and exposes six tools through MCP for use with any compatible AI client.
 
@@ -6,7 +6,7 @@ All LLM inference runs locally via Ollama. No external API keys are required for
 
 ## What It Does
 
-The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A news scraper monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events, not generic templates.
+The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A RE news monitor + aggregator monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events, not generic templates.
 
 A standalone daily brief script runs on a cron schedule, delivering a prioritized HTML briefing to your inbox each morning with the top five accounts to contact and why.
 
@@ -24,13 +24,13 @@ Any MCP-compatible client can connect to this server, including:
 - **Goose CLI** (Block, open source)
 - **Custom clients** built with the official Python, TypeScript, Go, C#, or Java SDKs
 
-The protocol is model-agnostic. You build the server once and it works everywhere. Configuration details for Claude Desktop are provided below as a reference example, but the setup pattern is similar across clients.
+The protocol is model-agnostic. You build the server once, and it works everywhere. Configuration details for Claude Desktop are provided below as a reference example, but the setup pattern is similar across clients.
 
 ## Architecture
 
 The system is structured in five layers, each depending only on the layers beneath it.
 
-**Foundation** contains all configuration constants (territory regions, excluded states, urgency tier keywords, LLM settings) and the five JSON data files that define accounts, products, email templates, Yardi resource mappings, and the news cache.
+**Foundation** contains all configuration constants (territory regions, excluded states, urgency-tier keywords, LLM settings) and the five JSON data files that define accounts, products, email templates, product-marketing resource mappings, and the news cache.
 
 **Utilities** provide the LLM client (Ollama primary, with a multi-provider pattern that supports remote fallback if explicitly configured), web scraping functions for news sources and company research, and output formatters for all tool responses.
 

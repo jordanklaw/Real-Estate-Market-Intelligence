@@ -8,7 +8,7 @@ Runs the full pipeline:
 4. Match news to accounts by region, portfolio type, and competitive situation
 5. Rank and select top 5 accounts (weighted: news urgency + deal stage + days since contact)
 6. Generate talking points and Yardi product angle for each
-7. Send as HTML email via Gmail API to jordan.k.law@gmail.com
+7. Send as HTML email via Gmail API to the configured recipient
 8. Save brief as dated file in briefs/ folder
 
 Cron schedule: 5:30 AM Pacific, Monday-Friday
@@ -381,7 +381,10 @@ async def run_daily_brief():
 
     # Step 7b: Send email
     subject = f"Daily Sales Intelligence Brief - {today}"
-    send_gmail(html, subject, DAILY_BRIEF_RECIPIENT)
+    if DAILY_BRIEF_RECIPIENT:
+        send_gmail(html, subject, DAILY_BRIEF_RECIPIENT)
+    else:
+        print("Set DAILY_BRIEF_RECIPIENT in .env to enable email delivery.")
 
     print(f"\nDaily brief complete!")
 

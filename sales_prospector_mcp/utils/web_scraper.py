@@ -58,10 +58,10 @@ CITY_TO_STATE = {
 }
 
 # Explicit city/state disambiguation patterns for ambiguous city names.
-CITY_STATE_PATTERNS = {
-    r"\bcharleston\s*,?\s*(west\s+virginia|wv)\b": "WV",
-    r"\bcharleston\s*,?\s*(south\s+carolina|sc)\b": "SC",
-}
+CITY_STATE_PATTERNS = [
+    (r"\bcharleston\b.{0,40}\b(wv|west virginia)\b", "WV"),
+    (r"\bcharleston\b.{0,40}\b(sc|south carolina)\b", "SC"),
+]
 
 
 def classify_urgency(title: str, summary: str) -> str:
@@ -101,8 +101,8 @@ def detect_regions(text: str) -> list[dict]:
                 found.append({"state": state, "region": region})
                 seen_states.add(state)
 
-    # Check explicit ambiguous city + state patterns.
-    for pattern, state in CITY_STATE_PATTERNS.items():
+    # Check explicit disambiguation patterns first (e.g., "Charleston, WV")
+    for pattern, state in CITY_STATE_PATTERNS:
         if state in EXCLUDED_STATES or state in seen_states:
             continue
         if state not in STATE_TO_REGION:
@@ -111,7 +111,7 @@ def detect_regions(text: str) -> list[dict]:
             found.append({"state": state, "region": STATE_TO_REGION[state]})
             seen_states.add(state)
 
-    # Check city names
+    # Check city names using unique city->state mapping
     for city, state in CITY_TO_STATE.items():
         if state in EXCLUDED_STATES or state in seen_states:
             continue

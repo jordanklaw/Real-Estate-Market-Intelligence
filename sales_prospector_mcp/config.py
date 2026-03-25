@@ -64,10 +64,9 @@ URGENCY_KEYWORDS = {
 }
 
 # LLM configuration
-LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "auto")  # "ollama", "anthropic", or "auto"
+# No Anthropic fallback by default. See llm_client.py for remote provider pattern.
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
-ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
 
 # News cache settings
 NEWS_CACHE_MAX_AGE_HOURS = 24

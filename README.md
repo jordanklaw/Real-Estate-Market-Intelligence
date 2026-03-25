@@ -1,14 +1,30 @@
 # Real Estate Market Intelligence
 
-A local-first sales intelligence system built on FastMCP, designed for commercial and multifamily real estate software sales. The system scrapes industry news, matches signals to accounts by territory and urgency, and exposes six tools through the Model Context Protocol for use with Claude Desktop or any MCP-compatible client.
+A local-first sales intelligence system built on the Model Context Protocol (MCP), designed for commercial and multifamily real estate software sales. The system scrapes industry news, matches signals to accounts by territory and urgency, and exposes six tools through MCP for use with any compatible AI client.
 
 All LLM inference runs locally via Ollama. No external API keys are required for core functionality.
 
 ## What It Does
 
-The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A news scraper monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events rather than generic templates.
+The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A news scraper monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events, not generic templates.
 
 A standalone daily brief script runs on a cron schedule, delivering a prioritized HTML briefing to your inbox each morning with the top five accounts to contact and why.
+
+## MCP Compatibility
+
+This server implements the [Model Context Protocol](https://modelcontextprotocol.io/), an open standard introduced by Anthropic in 2024 and since adopted across the industry. MCP is now maintained by the Agentic AI Foundation under the Linux Foundation, co-founded by Anthropic, Block, and OpenAI.
+
+Any MCP-compatible client can connect to this server, including:
+
+- **Claude Desktop** (Anthropic)
+- **ChatGPT Desktop** (OpenAI)
+- **Gemini** (Google DeepMind)
+- **Microsoft Copilot / VS Code** (Microsoft)
+- **Cursor** and **Windsurf** (AI-native IDEs)
+- **Goose CLI** (Block, open source)
+- **Custom clients** built with the official Python, TypeScript, Go, C#, or Java SDKs
+
+The protocol is model-agnostic. You build the server once and it works everywhere. Configuration details for Claude Desktop are provided below as a reference example, but the setup pattern is similar across clients.
 
 ## Architecture
 
@@ -56,7 +72,7 @@ cd Real-Estate-Market-Intelligence
 bash install.sh
 ```
 
-The install script creates a virtual environment, installs dependencies, creates the `briefs/` directory, and prints the Claude Desktop configuration block with absolute paths for your machine.
+The install script creates a virtual environment, installs dependencies, creates the `briefs/` directory, and prints a Claude Desktop configuration block with absolute paths for your machine. The same server binary works with any MCP client.
 
 ## Configuration
 
@@ -70,15 +86,15 @@ The only required variable for the daily brief email delivery is `DAILY_BRIEF_RE
 
 To use the optional remote LLM fallback, set `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` in `.env`. This is not required and not recommended for default operation.
 
-## Claude Desktop Setup
+## Connecting to an MCP Client
 
-After running `install.sh`, add the printed JSON block to your Claude Desktop config file.
+The server runs as a local process that any MCP client can connect to. Below are setup instructions for the most common clients.
 
-On Linux: `~/.config/Claude/claude_desktop_config.json`
+### Claude Desktop
 
-On macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-The configuration will look like this (paths will match your machine):
+Config file location:
+- Linux: `~/.config/Claude/claude_desktop_config.json`
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -92,7 +108,19 @@ The configuration will look like this (paths will match your machine):
 }
 ```
 
-Restart Claude Desktop. The six tools will appear in the tool picker.
+`install.sh` prints this block with the correct absolute paths for your machine. Restart Claude Desktop after saving.
+
+### ChatGPT Desktop
+
+OpenAI adopted MCP in March 2025. In ChatGPT Desktop, navigate to Settings and add an MCP server with the same command and args shown above. Consult [OpenAI's MCP documentation](https://platform.openai.com/docs) for the latest configuration format.
+
+### Cursor / Windsurf / VS Code
+
+These IDEs support MCP through their settings or extension configuration. Point the MCP server config to the same Python binary and module entry point. Each IDE's documentation covers the specific JSON structure.
+
+### Custom Clients
+
+The official MCP SDKs (Python, TypeScript, Go, C#, Java) allow you to build your own client. The server exposes standard MCP tool definitions with typed parameters and docstrings. Any client implementing the MCP spec can discover and call all six tools.
 
 ## Daily Brief Setup
 
@@ -149,10 +177,14 @@ Real-Estate-Market-Intelligence/
 ├── briefs/
 ├── requirements.txt
 ├── install.sh
-├── .env
+├── .env.example
 └── .gitignore
 ```
 
 ## Stack
 
-Python 3.11, FastMCP, Ollama, Qwen3 14B, Ubuntu 24.04 LTS, Gmail API, Google Drive API, BeautifulSoup4, httpx, cron.
+Python 3.11, FastMCP, Model Context Protocol, Ollama, Qwen3 14B, Ubuntu 24.04 LTS, Gmail API, BeautifulSoup4, httpx, cron.
+
+## License
+
+MIT

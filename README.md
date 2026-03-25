@@ -1,12 +1,12 @@
-# Real Estate Market Intelligence MCP
+# Real Estate Market Intelligence (MCP)
 
-A local-first sales intelligence system built on the Model Context Protocol (MCP), designed for commercial and multifamily real estate software sales. The system scrapes industry news, matches signals to accounts by territory and urgency, and exposes six tools through MCP for use with any compatible AI client.
+A local-first sales intelligence system built on the Model Context Protocol (MCP), designed for commercial and multifamily real estate software sales. The system aggregates RE industry news, matches signals to accounts by territory and urgency, and exposes six tools through MCP for use with any compatible AI client.
 
 All LLM inference runs locally via Ollama. No external API keys are required for core functionality.
 
 ## What It Does
 
-The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A RE news monitor + aggregator monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events, not generic templates.
+The MCP server gives a sales rep six tools that turn raw market data into actionable outreach. A RE news feed monitors Multi-Housing News and Commercial Property Executive, categorizes articles by region and urgency tier, and cross-references them against a territory-filtered account list. The pipeline ranker scores accounts by deal stage, recency, and portfolio size. The email drafter and call prep tools generate personalized outreach grounded in real news events, not generic templates.
 
 A standalone daily brief script runs on a cron schedule, delivering a prioritized HTML briefing to your inbox each morning with the top five accounts to contact and why.
 

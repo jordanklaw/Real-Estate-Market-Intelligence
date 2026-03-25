@@ -33,9 +33,12 @@ python server.py
 
 ## LLM Configuration
 
-The server tries Ollama (localhost:11434, qwen2.5:7b) first, then falls back to Anthropic API.
+By default, the server uses Ollama (`http://localhost:11434`).
+If `LLM_PROVIDER` is unset, runtime checks Ollama availability and raises an error if it is not running.
 
-Set `LLM_PROVIDER` env var to override: `ollama` or `anthropic`.
+Set `LLM_PROVIDER` to explicitly choose a provider:
+- `ollama` (default behavior; requires local Ollama server)
+- `anthropic` (requires `ANTHROPIC_API_KEY` and `anthropic` package)
 
 ## Daily Brief
 

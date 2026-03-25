@@ -32,28 +32,29 @@ STATE_NAMES = {
     "wisconsin": "WI", "wyoming": "WY",
 }
 
-# Major cities to state mapping for region detection
-CITY_TO_STATE = {
-    "new york": "NY", "manhattan": "NY", "brooklyn": "NY", "queens": "NY",
-    "newark": "NJ", "jersey city": "NJ", "hoboken": "NJ",
-    "baltimore": "MD", "bethesda": "MD", "wilmington": "DE",
-    "washington": "DC", "arlington": "VA", "richmond": "VA", "norfolk": "VA",
-    "charleston": "WV", "pittsburgh": "PA", "philadelphia": "PA",
-    "charlotte": "NC", "raleigh": "NC", "durham": "NC", "greensboro": "NC",
-    "charleston": "SC", "columbia": "SC", "greenville": "SC",
-    "atlanta": "GA", "savannah": "GA", "augusta": "GA",
-    "miami": "FL", "orlando": "FL", "tampa": "FL", "jacksonville": "FL",
-    "fort lauderdale": "FL", "west palm beach": "FL",
-    "dallas": "TX", "houston": "TX", "austin": "TX", "san antonio": "TX",
-    "fort worth": "TX", "oklahoma city": "OK", "tulsa": "OK",
-    "little rock": "AR", "new orleans": "LA", "baton rouge": "LA",
-    "jackson": "MS", "memphis": "TN", "nashville": "TN", "knoxville": "TN",
-    "birmingham": "AL", "huntsville": "AL", "mobile": "AL",
-    "louisville": "KY", "lexington": "KY",
-    "columbus": "OH", "cleveland": "OH", "cincinnati": "OH",
-    "indianapolis": "IN", "fort wayne": "IN",
-    "kansas city": "MO", "st. louis": "MO", "st louis": "MO",
-    "des moines": "IA", "omaha": "NE", "wichita": "KS",
+# Major cities to state mapping for region detection.
+# Some city names are ambiguous (e.g., Charleston in WV/SC), so values are lists.
+CITY_TO_STATES = {
+    "new york": ["NY"], "manhattan": ["NY"], "brooklyn": ["NY"], "queens": ["NY"],
+    "newark": ["NJ"], "jersey city": ["NJ"], "hoboken": ["NJ"],
+    "baltimore": ["MD"], "bethesda": ["MD"], "wilmington": ["DE"],
+    "washington": ["DC"], "arlington": ["VA"], "richmond": ["VA"], "norfolk": ["VA"],
+    "charleston": ["WV", "SC"], "pittsburgh": ["PA"], "philadelphia": ["PA"],
+    "charlotte": ["NC"], "raleigh": ["NC"], "durham": ["NC"], "greensboro": ["NC"],
+    "columbia": ["SC"], "greenville": ["SC"],
+    "atlanta": ["GA"], "savannah": ["GA"], "augusta": ["GA"],
+    "miami": ["FL"], "orlando": ["FL"], "tampa": ["FL"], "jacksonville": ["FL"],
+    "fort lauderdale": ["FL"], "west palm beach": ["FL"],
+    "dallas": ["TX"], "houston": ["TX"], "austin": ["TX"], "san antonio": ["TX"],
+    "fort worth": ["TX"], "oklahoma city": ["OK"], "tulsa": ["OK"],
+    "little rock": ["AR"], "new orleans": ["LA"], "baton rouge": ["LA"],
+    "jackson": ["MS"], "memphis": ["TN"], "nashville": ["TN"], "knoxville": ["TN"],
+    "birmingham": ["AL"], "huntsville": ["AL"], "mobile": ["AL"],
+    "louisville": ["KY"], "lexington": ["KY"],
+    "columbus": ["OH"], "cleveland": ["OH"], "cincinnati": ["OH"],
+    "indianapolis": ["IN"], "fort wayne": ["IN"],
+    "kansas city": ["MO"], "st. louis": ["MO"], "st louis": ["MO"],
+    "des moines": ["IA"], "omaha": ["NE"], "wichita": ["KS"],
 }
 
 
@@ -95,14 +96,25 @@ def detect_regions(text: str) -> list[dict]:
                 seen_states.add(state)
 
     # Check city names
-    for city, state in CITY_TO_STATE.items():
-        if state in EXCLUDED_STATES or state in seen_states:
-            continue
-        if state not in STATE_TO_REGION:
-            continue
+    for city, states in CITY_TO_STATES.items():
         if city in text_lower:
-            found.append({"state": state, "region": STATE_TO_REGION[state]})
-            seen_states.add(state)
+            candidate_states = states
+            if len(states) > 1:
+                explicit_states = []
+                for state in states:
+                    state_name = next((name for name, abbr in STATE_NAMES.items() if abbr == state), "")
+                    if re.search(rf"\b{state}\b", text) or (state_name and state_name in text_lower):
+                        explicit_states.append(state)
+                if explicit_states:
+                    candidate_states = explicit_states
+
+            for state in candidate_states:
+                if state in EXCLUDED_STATES or state in seen_states:
+                    continue
+                if state not in STATE_TO_REGION:
+                    continue
+                found.append({"state": state, "region": STATE_TO_REGION[state]})
+                seen_states.add(state)
 
     return found
 

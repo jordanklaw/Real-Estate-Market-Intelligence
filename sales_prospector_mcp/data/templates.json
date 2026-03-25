@@ -1,0 +1,111 @@
+{
+  "email_templates": {
+    "outreach": {
+      "subject_pattern": "Quick thought on {company_name}'s property operations",
+      "structure": [
+        "news_hook: Open with a relevant industry news item that affects their market or portfolio type",
+        "bridge: Connect the news to a specific challenge or opportunity they likely face",
+        "value_prop: Introduce how Yardi addresses this challenge with a specific feature or capability",
+        "resource_link: Share a relevant Yardi resource (case study, whitepaper, or product page)",
+        "soft_cta: Suggest a brief conversation, not a demo or commitment"
+      ],
+      "tone": "Consultative, peer-level, not salesy. Show you understand their market.",
+      "length": "Under 150 words"
+    },
+    "follow_up": {
+      "subject_pattern": "Following up: {topic} for {company_name}",
+      "structure": [
+        "reference: Briefly reference previous conversation or touchpoint",
+        "new_value: Share one new insight or resource since last contact",
+        "bridge: Connect to their specific situation or pain point discussed",
+        "next_step: Propose a specific, low-commitment next step"
+      ],
+      "tone": "Warm, persistent but not pushy. Add value with each touch.",
+      "length": "Under 120 words"
+    },
+    "re_engage": {
+      "subject_pattern": "Something changed in {market} that affects {company_name}",
+      "structure": [
+        "news_hook: Lead with a significant market development in their area",
+        "relevance: Explain specifically why this matters to their portfolio",
+        "bridge: Mention how other similar companies are responding",
+        "soft_cta: Offer to share more details in a brief call"
+      ],
+      "tone": "Informative, helpful. Position yourself as a market resource, not a vendor.",
+      "length": "Under 130 words"
+    },
+    "pricing": {
+      "subject_pattern": "Investment overview for {company_name}'s {product} implementation",
+      "structure": [
+        "context: Reference their specific needs and portfolio details",
+        "value_summary: Recap 2-3 key value drivers specific to their situation",
+        "roi_angle: Frame pricing in terms of ROI or cost savings vs current state",
+        "next_step: Propose a pricing review call with decision makers"
+      ],
+      "tone": "Professional, confident. Focus on investment and return, not cost.",
+      "length": "Under 150 words"
+    },
+    "value_add": {
+      "subject_pattern": "{resource_topic} - thought you'd find this useful",
+      "structure": [
+        "context: Brief mention of their role or market",
+        "resource: Share a specific Yardi resource, report, or insight",
+        "relevance: One sentence on why this is relevant to them specifically",
+        "soft_cta: No ask - just 'happy to discuss if helpful'"
+      ],
+      "tone": "Generous, no-strings-attached. Build trust through value.",
+      "length": "Under 100 words"
+    }
+  },
+  "call_prep_templates": {
+    "discovery": {
+      "sections": [
+        "Company Overview: Size, portfolio type, market position",
+        "Current Tech Stack: Known systems, pain points, contract status",
+        "Discovery Questions: 5-7 open-ended questions about their operations, challenges, and goals",
+        "Value Hypotheses: 2-3 potential value propositions to test",
+        "Competitive Intel: Known competitor relationships and switching triggers",
+        "Next Steps: Proposed outcomes for the call"
+      ]
+    },
+    "demo": {
+      "sections": [
+        "Demo Agenda: Tailored feature walkthrough based on their priorities",
+        "Key Pain Points: Specific issues to address with live examples",
+        "Competitor Comparison: Feature gaps in their current system",
+        "ROI Data Points: Relevant metrics and case studies",
+        "Objection Prep: Likely objections with responses",
+        "Close Plan: Proposed next steps after demo"
+      ]
+    },
+    "follow_up": {
+      "sections": [
+        "Previous Meeting Summary: Key takeaways and action items",
+        "Open Questions: Unresolved items from last conversation",
+        "New Information: Recent news or developments relevant to their decision",
+        "Value Reinforcement: Key benefits to reiterate",
+        "Momentum Plan: Steps to keep deal moving forward"
+      ]
+    },
+    "negotiation": {
+      "sections": [
+        "Deal Summary: Units, products, pricing discussed",
+        "Decision Makers: Key stakeholders and their priorities",
+        "Negotiation Points: Known concerns and flexibility ranges",
+        "Competitive Threats: Alternative solutions they're considering",
+        "Win Strategy: Key differentiators and closing arguments",
+        "Timeline: Critical dates and contract milestones"
+      ]
+    },
+    "renewal": {
+      "sections": [
+        "Account History: Current products, tenure, satisfaction level",
+        "Usage Analytics: Product adoption and utilization patterns",
+        "Expansion Opportunities: Additional products or modules",
+        "Risk Factors: Known issues or competitor conversations",
+        "Renewal Strategy: Pricing, terms, and value reinforcement",
+        "Growth Plan: 12-month vision for the account"
+      ]
+    }
+  }
+}

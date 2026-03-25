@@ -1,0 +1,104 @@
+{
+  "topic_categories": {
+    "legal_regulatory": {
+      "description": "Eviction laws, rent control, fair housing, compliance changes",
+      "yardi_features": [
+        "Voyager 8 Compliance Dashboard: Automated tracking of local, state, and federal regulations",
+        "Rent Control Management: Built-in rent increase calculators for controlled jurisdictions",
+        "Fair Housing Compliance: Automated screening criteria consistency and audit trails",
+        "Document Management: Lease generation with jurisdiction-specific clauses",
+        "Regulatory Reporting: Automated report generation for housing authority submissions"
+      ],
+      "talking_points": [
+        "Staying compliant across multiple jurisdictions is a full-time job - Voyager automates the tracking",
+        "Recent regulatory changes in {state} make automated compliance monitoring critical",
+        "Manual compliance tracking creates liability exposure. Voyager provides audit-ready documentation."
+      ],
+      "resources": [
+        "Yardi Compliance Solutions Overview",
+        "Case Study: Multi-State Compliance Automation",
+        "Whitepaper: Navigating Rent Control with Technology"
+      ]
+    },
+    "interest_rates_financing": {
+      "description": "Rate changes, financing trends, investment market shifts",
+      "yardi_features": [
+        "Investment Management Suite: Portfolio-level financial modeling and scenario analysis",
+        "Asset Tracking: Real-time NOI, cap rate, and valuation tracking across portfolio",
+        "Debt Management: Loan tracking, covenant compliance, and refinancing analysis",
+        "Investor Reporting: Automated distribution calculations and investor communications",
+        "Budget Forecasting: Multi-year projections with variable rate modeling"
+      ],
+      "talking_points": [
+        "With rates shifting, having real-time portfolio analytics isn't optional - it's how you spot refinancing windows",
+        "Voyager's investment management tools give you the same analytics institutional investors use",
+        "Automated investor reporting saves 20+ hours per month and eliminates errors in distribution calculations"
+      ],
+      "resources": [
+        "Yardi Investment Management Overview",
+        "Case Study: Portfolio Analytics for Mid-Market Operators",
+        "Webinar: Financial Modeling in a Volatile Rate Environment"
+      ]
+    },
+    "market_conditions": {
+      "description": "Vacancy rates, rent trends, supply pipeline, market forecasts",
+      "yardi_features": [
+        "Yardi Matrix: Industry-leading market data covering 20M+ units nationwide",
+        "RentCafe Market Surveys: Real-time competitive rent analysis by submarket",
+        "Revenue Management: Automated pricing optimization based on market conditions",
+        "Demand Forecasting: Predictive analytics for leasing and occupancy trends",
+        "Benchmarking: Portfolio performance vs market and peer group comparisons"
+      ],
+      "talking_points": [
+        "Yardi Matrix is the data source that institutional investors rely on - now available integrated into your operations platform",
+        "Real-time market data eliminates guesswork in pricing decisions and capital allocation",
+        "RentCafe gives you competitive intelligence on every submarket where you operate"
+      ],
+      "resources": [
+        "Yardi Matrix Market Intelligence",
+        "RentCafe Competitive Analysis Demo",
+        "Report: National Multifamily Market Outlook"
+      ]
+    },
+    "competitor_activity": {
+      "description": "Competitor acquisitions, platform changes, market consolidation",
+      "yardi_features": [
+        "Platform Consolidation: Single platform replacing 3-5 point solutions",
+        "Open API Architecture: Integration flexibility without vendor lock-in",
+        "Yardi Marketplace: Pre-built integrations with 200+ industry vendors",
+        "Data Portability: Full data export capabilities and migration support",
+        "Continuous Innovation: Regular feature releases without version upgrades"
+      ],
+      "talking_points": [
+        "When competitors get acquired, their product roadmap gets uncertain. Yardi is independent and privately held - our roadmap is stable.",
+        "Platform consolidation reduces vendor risk. One relationship, one support team, one data platform.",
+        "Companies switching from {competitor} typically see 30% reduction in total technology spend through consolidation."
+      ],
+      "resources": [
+        "Yardi Platform Consolidation Guide",
+        "Competitive Comparison Matrix",
+        "Case Study: From 5 Vendors to 1 Platform"
+      ]
+    },
+    "legacy_upgrade": {
+      "description": "Accounts on Genesis, Yardi Professional, DOS-era, or outdated platforms",
+      "yardi_features": [
+        "Breeze Premier Migration: Purpose-built upgrade path from legacy Yardi products",
+        "Data Conversion: Full historical data migration with integrity validation",
+        "Parallel Running: Run old and new systems side-by-side during transition",
+        "Training Programs: Role-based training for staff transitioning from legacy systems",
+        "Cloud Migration: Move from on-premise to cloud with zero data loss"
+      ],
+      "talking_points": [
+        "Your Genesis/Professional investment isn't lost - all your data and configurations carry forward to the modern platform",
+        "Cloud migration means no more server maintenance, automatic backups, and access from anywhere",
+        "Staff familiar with Yardi will find the modern interface intuitive - it builds on concepts they already know"
+      ],
+      "resources": [
+        "Yardi Upgrade Path Guide",
+        "Genesis to Breeze Premier Migration Checklist",
+        "Webinar: Modernizing Your Property Management Stack"
+      ]
+    }
+  }
+}

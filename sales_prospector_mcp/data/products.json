@@ -1,0 +1,80 @@
+{
+  "yardi_breeze": {
+    "name": "Yardi Breeze",
+    "target_segment": "Small to mid-size portfolios (up to 1,000 units), owner-operators, self-managed properties",
+    "key_value_props": [
+      "Intuitive cloud-based interface with minimal training required",
+      "Built-in online payments and tenant portal",
+      "Automated accounting and financial reporting",
+      "Maintenance request tracking with mobile access",
+      "Affordable per-unit pricing with no long-term contracts",
+      "RentCafe marketing website included"
+    ],
+    "common_objections": {
+      "too_simple": "Breeze handles up to 1,000 units with full accounting, maintenance, and marketing. It covers 95% of what most operators need without the complexity overhead.",
+      "limited_reporting": "Breeze includes 30+ standard reports covering financials, occupancy, and maintenance. For custom reporting needs, Breeze Premier adds advanced analytics.",
+      "not_scalable": "Breeze is designed as an on-ramp. When you grow past its capabilities, upgrading to Breeze Premier or Voyager is seamless with full data migration.",
+      "already_have_system": "Most operators switching from spreadsheets or basic tools see 15-20 hours per month in time savings within the first 90 days."
+    },
+    "upgrade_path": {
+      "from_dos_era": "Direct migration from DOS-based systems. Yardi handles full data conversion including historical financials. Typical migration: 4-6 weeks.",
+      "from_spreadsheets": "Import tenant, unit, and financial data via structured templates. Onboarding team provides white-glove setup assistance.",
+      "from_genesis": "Yardi-to-Yardi migration is streamlined. All historical data transfers automatically. Most Genesis users are up and running in 2-3 weeks."
+    }
+  },
+  "breeze_premier": {
+    "name": "Yardi Breeze Premier",
+    "target_segment": "Growing portfolios (500-5,000 units), regional operators, mixed-use portfolios, companies outgrowing entry-level systems",
+    "key_value_props": [
+      "Everything in Breeze plus advanced features",
+      "Job cost tracking for renovation and construction projects",
+      "Advanced budgeting and forecasting tools",
+      "Custom report builder with drag-and-drop interface",
+      "Corporate-level accounting with multi-entity support",
+      "Investor reporting and document management",
+      "Integration with Yardi Marketplace vendor network"
+    ],
+    "common_objections": {
+      "price_jump_from_breeze": "Premier typically costs 30-40% more than Breeze but eliminates the need for 2-3 separate tools most operators bolt on. Net savings average $200-400/month.",
+      "too_complex": "Premier uses the same intuitive Breeze interface. Advanced features are modular - enable only what you need. No feature bloat.",
+      "competitor_comparison": "Unlike AppFolio or Buildium, Premier includes investment management, job costing, and a full vendor marketplace at no additional per-feature cost.",
+      "migration_risk": "Yardi's migration team has completed 10,000+ transitions. We guarantee data integrity and provide parallel running periods."
+    },
+    "upgrade_path": {
+      "from_appfolio": "Full data migration including tenant history, lease terms, and financials. AppFolio's limited API means CSV export/import, but Yardi's team handles the entire process. 6-8 week timeline.",
+      "from_buildium": "Direct migration path with Yardi handling all data conversion. Most Buildium users gain immediate access to superior reporting and accounting depth.",
+      "from_realpage": "Structured migration from RealPage OneSite. Yardi provides dedicated project manager and parallel system running for 30 days.",
+      "from_professional": "Seamless Yardi-to-Yardi upgrade. All configurations, workflows, and historical data carry forward. Typical timeline: 3-4 weeks.",
+      "from_genesis": "Natural upgrade path. Genesis users retain familiarity while gaining cloud access, mobile capabilities, and modern reporting."
+    }
+  },
+  "voyager_8": {
+    "name": "Voyager 8",
+    "target_segment": "Enterprise portfolios (2,000+ units), institutional owners, REITs, national management companies, mixed commercial/residential portfolios",
+    "key_value_props": [
+      "Enterprise-grade platform with unlimited scalability",
+      "Full commercial and residential property management",
+      "Advanced investment management and asset tracking",
+      "Comprehensive compliance and regulatory reporting",
+      "Yardi Matrix market intelligence integration",
+      "Procure to Pay with automated invoice processing",
+      "Business intelligence dashboards with real-time KPIs",
+      "Multi-site, multi-entity, multi-currency support",
+      "Full API suite for third-party integrations",
+      "RentCafe suite for marketing, leasing, and resident services"
+    ],
+    "common_objections": {
+      "implementation_time": "Voyager 8 implementations follow a structured methodology. Typical enterprise deployment: 12-16 weeks with phased rollout. Yardi provides dedicated implementation team.",
+      "cost": "Voyager's total cost of ownership is typically 20-30% lower than cobbling together multiple point solutions. ROI analysis available for your specific portfolio.",
+      "learning_curve": "Yardi provides role-based training programs, online Yardi University courses, and ongoing support. Most users are productive within 2 weeks of go-live.",
+      "already_on_competitor": "Voyager 8 is the only platform that truly unifies residential, commercial, and investment management. Competitors require multiple products to match this capability.",
+      "happy_with_current": "We understand. But consider: are you getting real-time portfolio analytics, automated compliance reporting, and integrated market data? Voyager 8 provides strategic advantage, not just property management."
+    },
+    "upgrade_path": {
+      "from_mri": "MRI to Voyager migration is well-documented with hundreds of successful transitions. Full data mapping, parallel running, and dedicated PM included.",
+      "from_realpage": "Enterprise migration from RealPage with full data preservation. Yardi's migration team handles GL mapping, lease abstraction, and historical data transfer.",
+      "from_professional": "The most common Yardi upgrade path. All Professional configurations and customizations carry forward. Enhanced with Voyager's enterprise features.",
+      "from_genesis": "Full modernization from Genesis to cloud-native Voyager 8. Historical data preserved. Training program included to bridge feature gap."
+    }
+  }
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "company_name": "Greystone Property Management",
+    "city": "New York",
+    "state": "NY",
+    "units": 4200,
+    "portfolio_type": "multifamily",
+    "deal_stage": "discovery",
+    "last_contact": "2026-03-10",
+    "current_product": "Yardi Genesis",
+    "target_product": "Voyager 8",
+    "notes": "Large portfolio, legacy system causing reporting delays. VP of Ops expressed interest in consolidated platform."
+  },
+  {
+    "company_name": "Liberty Residential Group",
+    "city": "Newark",
+    "state": "NJ",
+    "units": 1800,
+    "portfolio_type": "multifamily",
+    "deal_stage": "demo",
+    "last_contact": "2026-03-18",
+    "current_product": "AppFolio",
+    "target_product": "Breeze Premier",
+    "notes": "Competitor switch opportunity. Frustrated with AppFolio reporting limitations. Demo scheduled for next week."
+  },
+  {
+    "company_name": "Chesapeake Holdings",
+    "city": "Baltimore",
+    "state": "MD",
+    "units": 3100,
+    "portfolio_type": "mixed",
+    "deal_stage": "proposal",
+    "last_contact": "2026-03-05",
+    "current_product": "RealPage",
+    "target_product": "Voyager 8",
+    "notes": "Mixed portfolio with commercial and residential. Need unified platform. Proposal sent, awaiting CFO review."
+  },
+  {
+    "company_name": "Peachtree Capital Apartments",
+    "city": "Atlanta",
+    "state": "GA",
+    "units": 2500,
+    "portfolio_type": "multifamily",
+    "deal_stage": "prospect",
+    "last_contact": "2026-02-20",
+    "current_product": "Buildium",
+    "target_product": "Breeze Premier",
+    "notes": "Growing portfolio, current system can't scale. Met at NMHC conference."
+  },
+  {
+    "company_name": "Suncoast Living Partners",
+    "city": "Tampa",
+    "state": "FL",
+    "units": 5800,
+    "portfolio_type": "multifamily",
+    "deal_stage": "negotiation",
+    "last_contact": "2026-03-20",
+    "current_product": "Yardi Professional",
+    "target_product": "Voyager 8",
+    "notes": "Existing Yardi customer ready for upgrade. Negotiating enterprise pricing. Strong internal champion in IT director."
+  },
+  {
+    "company_name": "Lone Star Realty Group",
+    "city": "Dallas",
+    "state": "TX",
+    "units": 3400,
+    "portfolio_type": "SFR",
+    "deal_stage": "discovery",
+    "last_contact": "2026-03-12",
+    "current_product": "Propertyware",
+    "target_product": "Breeze Premier",
+    "notes": "SFR portfolio expanding rapidly. Need better maintenance tracking and owner portal. Initial call went well."
+  },
+  {
+    "company_name": "Buckeye Property Solutions",
+    "city": "Columbus",
+    "state": "OH",
+    "units": 950,
+    "portfolio_type": "multifamily",
+    "deal_stage": "prospect",
+    "last_contact": "2026-01-15",
+    "current_product": "DOS-era legacy",
+    "target_product": "Yardi Breeze",
+    "notes": "Still on DOS-based system. Owner-operator ready to modernize. Cost-sensitive, Breeze is right fit."
+  },
+  {
+    "company_name": "Carolina Asset Management",
+    "city": "Charlotte",
+    "state": "NC",
+    "units": 2200,
+    "portfolio_type": "commercial",
+    "deal_stage": "follow_up",
+    "last_contact": "2026-03-01",
+    "current_product": "MRI Software",
+    "target_product": "Voyager 8",
+    "notes": "Commercial portfolio with retail and office. MRI contract up for renewal in Q3. Key decision maker is COO."
+  }
+]

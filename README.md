@@ -158,7 +158,7 @@ Real-Estate-Market-Intelligence/
 │   │   ├── accounts.json
 │   │   ├── products.json
 │   │   ├── templates.json
-│   │   ├── yardi_resources.json
+│   │   ├── product marketing_resources.json
 │   │   └── news_cache.json
 │   ├── utils/
 │   │   ├── __init__.py

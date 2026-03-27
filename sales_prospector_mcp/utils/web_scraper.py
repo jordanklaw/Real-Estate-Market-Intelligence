@@ -57,16 +57,16 @@ NEWS_SOURCES = {
     "mhn": {
         "name": "Multi-Housing News",
         "url": "https://www.multihousingnews.com/",
-        "article_selector": "article",
-        "title_selector": "h2 a, h3 a",
-        "link_selector": "h2 a, h3 a",
+        "article_selector": ".post",
+        "title_selector": "h3 a, h2 a",
+        "link_selector": "h3 a, h2 a",
     },
     "cpe": {
         "name": "Commercial Property Executive",
         "url": "https://www.commercialsearch.com/news/",  # was cpexecutive.com
-        "article_selector": "article",
-        "title_selector": "h2 a, h3 a",
-        "link_selector": "h2 a, h3 a",
+        "article_selector": ".post",
+        "title_selector": "h3 a, h2 a",
+        "link_selector": "h3 a, h2 a",
     },
 }
 

@@ -36,7 +36,12 @@ from sales_prospector_mcp.config import (
     DAILY_BRIEF_RECIPIENT,
     DAILY_BRIEF_TOP_N,
 )
-from sales_prospector_mcp.utils.web_scraper import scrape_news_sources
+from sales_prospector_mcp.utils.web_scraper import (
+    scrape_all_sources,
+    format_scrape_summary,
+    classify_urgency,
+    detect_regions,
+)
 from sales_prospector_mcp.utils.llm_client import LLMClient
 from sales_prospector_mcp.utils.formatter import format_daily_brief_html
 
@@ -287,22 +292,36 @@ async def run_daily_brief():
     print(f"  Daily Sales Intelligence Brief - {today}")
     print(f"{'='*50}\n")
 
-    # Step 1: Scrape news
+    # Step 1: Scrape news (sync call with anti-blocking escalation)
     print("[1/7] Scraping news sources...")
-    articles = await scrape_news_sources()
-    # Filter excluded states
-    filtered_articles = []
-    for article in articles:
-        regions = article.get("regions", [])
-        if regions:
-            valid = [r for r in regions if r.get("state") not in EXCLUDED_STATES]
-            if valid:
-                article["regions"] = valid
-                filtered_articles.append(article)
-        else:
-            filtered_articles.append(article)
-    articles = filtered_articles
-    print(f"  Found {len(articles)} articles")
+    scrape_results = scrape_all_sources()
+    print(f"  {format_scrape_summary(scrape_results)}")
+
+    # Convert ScrapeResult objects to the dict format used downstream
+    articles = []
+    for r in scrape_results:
+        for a in r.articles:
+            text = f"{a.title} {a.snippet}"
+            regions = detect_regions(text)
+            urgency = classify_urgency(a.title, a.snippet)
+
+            # Skip articles only about excluded states
+            if regions and all(reg["state"] in EXCLUDED_STATES for reg in regions):
+                continue
+            regions = [reg for reg in regions if reg["state"] not in EXCLUDED_STATES]
+
+            articles.append({
+                "source": r.source_name,
+                "source_name": r.source_name,
+                "title": a.title,
+                "url": a.url,
+                "summary": a.snippet,
+                "date": "",
+                "regions": regions,
+                "urgency": urgency,
+                "scraped_at": a.scraped_at,
+            })
+    print(f"  {len(articles)} articles after filtering")
 
     # Step 2: Categorize (already done during scraping)
     print("[2/7] Articles categorized by region and urgency")

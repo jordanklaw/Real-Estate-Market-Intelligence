@@ -47,8 +47,8 @@ NEWS_SOURCES = {
     },
     "cpe": {
         "name": "Commercial Property Executive",
-        "base_url": "https://www.cpexecutive.com",
-        "feed_url": "https://www.cpexecutive.com/news/",
+        "base_url": "https://www.commercialsearch.com",
+        "feed_url": "https://www.commercialsearch.com/news/",
     },
 }
 

@@ -1,7 +1,14 @@
 """Utility modules for Sales Prospector MCP."""
 
 from .llm_client import LLMClient
-from .web_scraper import scrape_news_sources, scrape_homepage, search_duckduckgo
+from .web_scraper import (
+    scrape_all_sources,
+    format_scrape_summary,
+    scrape_homepage,
+    search_duckduckgo,
+    classify_urgency,
+    detect_regions,
+)
 from .formatter import (
     format_call_prep,
     format_email,
@@ -12,9 +19,12 @@ from .formatter import (
 
 __all__ = [
     "LLMClient",
-    "scrape_news_sources",
+    "scrape_all_sources",
+    "format_scrape_summary",
     "scrape_homepage",
     "search_duckduckgo",
+    "classify_urgency",
+    "detect_regions",
     "format_call_prep",
     "format_email",
     "format_pipeline_table",

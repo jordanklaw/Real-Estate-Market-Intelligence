@@ -1,6 +1,23 @@
-"""Web scraping utilities for news sources, homepages, and search."""
+"""
+Web scraper for real estate news sources.
 
+Escalation strategy:
+  1. httpx with realistic headers + session cookies
+  2. curl_cffi TLS fingerprint impersonation (if httpx fails)
+  3. Graceful degradation with structured error reporting
+
+Note on curl_cffi: It impersonates a real browser's TLS fingerprint to bypass
+bot detection. This is standard practice for personal automation tools, but be
+aware it sits in a gray area with some sites' ToS. For a once-daily cron job
+pulling headlines, this is reasonable. If open-sourcing, document the tradeoff.
+"""
+
+import asyncio
+import logging
+import random
 import re
+import time
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -8,12 +25,353 @@ import httpx
 from bs4 import BeautifulSoup
 
 from sales_prospector_mcp.config import (
-    NEWS_SOURCES,
     URGENCY_KEYWORDS,
     EXCLUDED_STATES,
     STATE_TO_REGION,
     TERRITORY_REGIONS,
 )
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+# Rotate through a small pool so the same UA isn't hitting every source
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+]
+
+HEADERS = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+# Source URLs -- CPE moved to commercialsearch.com in 2025
+NEWS_SOURCES = {
+    "mhn": {
+        "name": "Multi-Housing News",
+        "url": "https://www.multihousingnews.com/",
+        "article_selector": "article",
+        "title_selector": "h2 a, h3 a",
+        "link_selector": "h2 a, h3 a",
+    },
+    "cpe": {
+        "name": "Commercial Property Executive",
+        "url": "https://www.commercialsearch.com/news/",  # was cpexecutive.com
+        "article_selector": "article",
+        "title_selector": "h2 a, h3 a",
+        "link_selector": "h2 a, h3 a",
+    },
+}
+
+# Request spacing: random delay between source fetches to avoid
+# pattern-based blocking (same IP, same time, rapid succession)
+MIN_DELAY_SECONDS = 2
+MAX_DELAY_SECONDS = 8
+
+# ---------------------------------------------------------------------------
+# Data structures
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ScrapedArticle:
+    title: str
+    url: str
+    source: str
+    snippet: str = ""
+    scraped_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+
+
+@dataclass
+class ScrapeResult:
+    """Structured result so the caller always knows what happened."""
+    source_name: str
+    source_url: str
+    articles: list[ScrapedArticle] = field(default_factory=list)
+    success: bool = False
+    method: str = ""        # "httpx" | "curl_cffi" | "none"
+    error: str = ""
+    status_code: Optional[int] = None
+
+
+# ---------------------------------------------------------------------------
+# Fetch strategies (escalation ladder)
+# ---------------------------------------------------------------------------
+
+def _random_headers() -> dict:
+    """Headers with a randomly selected User-Agent."""
+    headers = HEADERS.copy()
+    headers["User-Agent"] = random.choice(_USER_AGENTS)
+    return headers
+
+
+def _fetch_httpx(url: str, timeout: int = 30) -> Optional[str]:
+    """
+    Strategy 1: httpx with realistic headers and session cookies.
+
+    Some sites (MHN) set cookies on the first request and only serve
+    real content on subsequent requests. A session preserves those cookies
+    across the retry.
+    """
+    headers = _random_headers()
+    try:
+        with httpx.Client(
+            headers=headers,
+            follow_redirects=True,
+            timeout=timeout,
+        ) as client:
+            response = client.get(url)
+
+            if response.status_code == 403:
+                logger.info(
+                    f"httpx got 403 on first request to {url}, "
+                    f"retrying with session cookies..."
+                )
+                time.sleep(random.uniform(1.5, 3.0))
+                response = client.get(url)
+
+            response.raise_for_status()
+            return response.text
+
+    except httpx.HTTPStatusError as e:
+        logger.warning(f"httpx failed for {url}: HTTP {e.response.status_code}")
+        return None
+    except httpx.RequestError as e:
+        logger.warning(f"httpx request error for {url}: {e}")
+        return None
+
+
+def _fetch_curl_cffi(url: str) -> Optional[str]:
+    """
+    Strategy 2: curl_cffi with browser TLS fingerprint impersonation.
+
+    Falls back here when httpx fails, typically because the site uses
+    Cloudflare or similar TLS fingerprint checks. Much lighter than
+    a headless browser -- safe for the IdeaPad's RAM constraints.
+    """
+    try:
+        from curl_cffi import requests as curl_requests
+    except ImportError:
+        logger.warning(
+            "curl_cffi not installed. Run: pip install curl_cffi "
+            "--break-system-packages (or in your venv)"
+        )
+        return None
+
+    try:
+        response = curl_requests.get(
+            url,
+            impersonate="chrome",
+            timeout=30,
+            headers=_random_headers(),
+        )
+        response.raise_for_status()
+        return response.text
+
+    except Exception as e:
+        logger.warning(f"curl_cffi failed for {url}: {e}")
+        return None
+
+
+def fetch_page(url: str) -> tuple[Optional[str], str]:
+    """
+    Try httpx first, then curl_cffi. Returns (html, method_used).
+    method_used is "httpx", "curl_cffi", or "none".
+    """
+    html = _fetch_httpx(url)
+    if html:
+        return html, "httpx"
+
+    logger.info(f"Escalating to curl_cffi for {url}")
+    html = _fetch_curl_cffi(url)
+    if html:
+        return html, "curl_cffi"
+
+    return None, "none"
+
+
+# ---------------------------------------------------------------------------
+# Parsing
+# ---------------------------------------------------------------------------
+
+def parse_articles(
+    html: str,
+    source_key: str,
+    source_config: dict,
+) -> list[ScrapedArticle]:
+    """
+    Parse article titles and URLs from a news source page.
+    Validates each article before including it.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    articles: list[ScrapedArticle] = []
+    seen_urls: set[str] = set()
+
+    # Try configured selector first, then fallback chain
+    article_elements = soup.select(source_config["article_selector"])
+    if not article_elements:
+        for fallback in [".post", ".entry", ".story", ".news-item"]:
+            article_elements = soup.select(fallback)
+            if article_elements:
+                break
+
+    for element in article_elements:
+        # Extract title: try configured selector, then common patterns
+        title_el = element.select_one(source_config["title_selector"])
+        if not title_el:
+            title_el = element.select_one("h2 a, h3 a, h4 a, a.entry-title")
+        if not title_el:
+            # Last resort: first anchor with text
+            title_el = element.find("a")
+        if not title_el:
+            continue
+        title = title_el.get_text(strip=True)
+
+        # Extract link
+        link_el = element.select_one(source_config["link_selector"])
+        if not link_el:
+            link_el = title_el  # title element is usually the link
+        url = link_el.get("href", "")
+
+        # Make relative URLs absolute
+        if url and not url.startswith("http"):
+            base = source_config["url"].rstrip("/")
+            url = f"{base}/{url.lstrip('/')}"
+
+        # --- Validation checks ---
+        if not title or len(title) < 5:
+            continue
+        if not url or not url.startswith("http"):
+            continue
+        if url in seen_urls:
+            continue
+        seen_urls.add(url)
+
+        # Extract snippet if available
+        snippet = ""
+        snippet_el = element.select_one("p, .excerpt, .summary, .description")
+        if snippet_el:
+            snippet = snippet_el.get_text(strip=True)[:300]
+
+        articles.append(
+            ScrapedArticle(
+                title=title,
+                url=url,
+                source=source_config["name"],
+                snippet=snippet,
+            )
+        )
+
+    return articles
+
+
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
+
+def scrape_all_sources() -> list[ScrapeResult]:
+    """
+    Scrape all configured news sources with escalation and spacing.
+
+    Returns a list of ScrapeResult objects -- one per source -- so the
+    caller always has structured data about what worked, what failed,
+    and why. No exceptions bubble up from here.
+    """
+    results: list[ScrapeResult] = []
+
+    source_keys = list(NEWS_SOURCES.keys())
+    random.shuffle(source_keys)  # Don't always hit the same source first
+
+    for i, key in enumerate(source_keys):
+        config = NEWS_SOURCES[key]
+        result = ScrapeResult(
+            source_name=config["name"],
+            source_url=config["url"],
+        )
+
+        # Spacing between requests (skip delay before the first one)
+        if i > 0:
+            delay = random.uniform(MIN_DELAY_SECONDS, MAX_DELAY_SECONDS)
+            logger.info(f"Waiting {delay:.1f}s before next source...")
+            time.sleep(delay)
+
+        try:
+            html, method = fetch_page(config["url"])
+
+            if html is None:
+                result.error = (
+                    f"All fetch strategies failed for {config['name']}. "
+                    f"Site may be blocking automated requests."
+                )
+                logger.warning(result.error)
+                results.append(result)
+                continue
+
+            result.method = method
+            result.articles = parse_articles(html, key, config)
+            result.success = True
+
+            logger.info(
+                f"Scraped {len(result.articles)} articles from "
+                f"{config['name']} via {method}"
+            )
+
+            # Validation: warn if we got HTML but zero articles
+            if not result.articles:
+                logger.warning(
+                    f"Got HTML from {config['name']} but parsed 0 articles. "
+                    f"Page structure may have changed -- check selectors."
+                )
+
+        except Exception as e:
+            result.error = f"Unexpected error scraping {config['name']}: {e}"
+            logger.error(result.error, exc_info=True)
+
+        results.append(result)
+
+    return results
+
+
+def format_scrape_summary(results: list[ScrapeResult]) -> str:
+    """
+    Human-readable summary for the daily brief email.
+    Shows what worked, what failed, and why -- so a 5:30 AM failure
+    tells you something actionable instead of just being empty.
+    """
+    lines: list[str] = []
+
+    total_articles = sum(len(r.articles) for r in results)
+    failed = [r for r in results if not r.success]
+
+    lines.append(f"Scraped {total_articles} articles from {len(results)} sources.")
+
+    if failed:
+        lines.append("")
+        lines.append("Failed sources:")
+        for r in failed:
+            lines.append(f"  - {r.source_name} ({r.source_url}): {r.error}")
+
+    for r in results:
+        if r.success and not r.articles:
+            lines.append(
+                f"  - {r.source_name}: HTML fetched via {r.method} "
+                f"but 0 articles parsed (selector mismatch?)"
+            )
+
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Preserved utility functions (used by daily_brief, news_brief, tools, tests)
+# ---------------------------------------------------------------------------
 
 # US state names to abbreviations
 STATE_NAMES = {
@@ -33,7 +391,6 @@ STATE_NAMES = {
 }
 
 # Major cities to state mapping for region detection.
-# Keep keys unique; ambiguous city names are handled in CITY_STATE_PATTERNS.
 CITY_TO_STATE = {
     "new york": "NY", "manhattan": "NY", "brooklyn": "NY", "queens": "NY",
     "newark": "NJ", "jersey city": "NJ", "hoboken": "NJ",
@@ -122,106 +479,6 @@ def detect_regions(text: str) -> list[dict]:
             seen_states.add(state)
 
     return found
-
-
-async def scrape_news_sources() -> list[dict]:
-    """Scrape MHN and CPE for news articles."""
-    articles = []
-
-    async with httpx.AsyncClient(
-        timeout=30.0,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        },
-        follow_redirects=True,
-    ) as client:
-        for source_key, source in NEWS_SOURCES.items():
-            try:
-                resp = await client.get(source["feed_url"])
-                resp.raise_for_status()
-                soup = BeautifulSoup(resp.text, "lxml")
-
-                # Try common article selectors
-                article_elements = (
-                    soup.select("article") or
-                    soup.select(".post") or
-                    soup.select(".entry") or
-                    soup.select("h2 a, h3 a")
-                )
-
-                for elem in article_elements[:15]:
-                    article = _parse_article_element(elem, source_key, source)
-                    if article:
-                        # Detect regions and classify urgency
-                        text = f"{article['title']} {article.get('summary', '')}"
-                        regions = detect_regions(text)
-                        urgency = classify_urgency(article["title"], article.get("summary", ""))
-
-                        # Skip articles only about excluded states
-                        if regions and all(r["state"] in EXCLUDED_STATES for r in regions):
-                            continue
-
-                        # Filter out excluded state regions
-                        regions = [r for r in regions if r["state"] not in EXCLUDED_STATES]
-
-                        article["regions"] = regions
-                        article["urgency"] = urgency
-                        article["scraped_at"] = datetime.now(timezone.utc).isoformat()
-                        articles.append(article)
-
-            except (httpx.HTTPError, httpx.TimeoutException) as e:
-                articles.append({
-                    "source": source_key,
-                    "source_name": source["name"],
-                    "title": f"[Scrape error: {source['name']}]",
-                    "url": source["feed_url"],
-                    "summary": f"Could not fetch articles: {str(e)}",
-                    "regions": [],
-                    "urgency": "FYI",
-                    "scraped_at": datetime.now(timezone.utc).isoformat(),
-                })
-
-    return articles
-
-
-def _parse_article_element(elem, source_key: str, source: dict) -> Optional[dict]:
-    """Parse a single article element from HTML."""
-    # Try to find title and link
-    title_elem = elem.select_one("h2 a, h3 a, h4 a, a.entry-title") or elem.find("a")
-    if not title_elem:
-        if elem.name == "a":
-            title_elem = elem
-        else:
-            return None
-
-    title = title_elem.get_text(strip=True)
-    if not title or len(title) < 10:
-        return None
-
-    url = title_elem.get("href", "")
-    if url and not url.startswith("http"):
-        url = source["base_url"].rstrip("/") + "/" + url.lstrip("/")
-
-    # Try to find summary
-    summary = ""
-    summary_elem = elem.select_one("p, .excerpt, .summary, .entry-summary")
-    if summary_elem:
-        summary = summary_elem.get_text(strip=True)
-
-    # Try to find date
-    date_str = ""
-    date_elem = elem.select_one("time, .date, .post-date, .entry-date")
-    if date_elem:
-        date_str = date_elem.get("datetime", "") or date_elem.get_text(strip=True)
-
-    return {
-        "source": source_key,
-        "source_name": source["name"],
-        "title": title,
-        "url": url,
-        "summary": summary[:500],
-        "date": date_str,
-    }
 
 
 async def scrape_homepage(url: str) -> dict:
@@ -317,3 +574,29 @@ async def search_duckduckgo(query: str, max_results: int = 5) -> list[dict]:
         })
 
     return results
+
+
+# ---------------------------------------------------------------------------
+# Standalone test
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+
+    print("Testing scraper...\n")
+    results = scrape_all_sources()
+
+    print(format_scrape_summary(results))
+    print()
+
+    for r in results:
+        if r.articles:
+            print(f"\n--- {r.source_name} ({r.method}) ---")
+            for a in r.articles[:5]:
+                print(f"  {a.title}")
+                print(f"    {a.url}")
+                if a.snippet:
+                    print(f"    {a.snippet[:100]}...")

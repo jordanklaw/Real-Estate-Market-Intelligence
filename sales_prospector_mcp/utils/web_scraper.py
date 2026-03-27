@@ -32,15 +32,16 @@ STATE_NAMES = {
     "wisconsin": "WI", "wyoming": "WY",
 }
 
-# Major cities to state mapping for region detection
+# Major cities to state mapping for region detection.
+# Keep keys unique; ambiguous city names are handled in CITY_STATE_PATTERNS.
 CITY_TO_STATE = {
     "new york": "NY", "manhattan": "NY", "brooklyn": "NY", "queens": "NY",
     "newark": "NJ", "jersey city": "NJ", "hoboken": "NJ",
     "baltimore": "MD", "bethesda": "MD", "wilmington": "DE",
     "washington": "DC", "arlington": "VA", "richmond": "VA", "norfolk": "VA",
-    "charleston": "WV", "pittsburgh": "PA", "philadelphia": "PA",
+    "pittsburgh": "PA", "philadelphia": "PA",
     "charlotte": "NC", "raleigh": "NC", "durham": "NC", "greensboro": "NC",
-    "charleston": "SC", "columbia": "SC", "greenville": "SC",
+    "columbia": "SC", "greenville": "SC",
     "atlanta": "GA", "savannah": "GA", "augusta": "GA",
     "miami": "FL", "orlando": "FL", "tampa": "FL", "jacksonville": "FL",
     "fort lauderdale": "FL", "west palm beach": "FL",
@@ -55,6 +56,12 @@ CITY_TO_STATE = {
     "kansas city": "MO", "st. louis": "MO", "st louis": "MO",
     "des moines": "IA", "omaha": "NE", "wichita": "KS",
 }
+
+# Explicit city/state disambiguation patterns for ambiguous city names.
+CITY_STATE_PATTERNS = [
+    (r"\bcharleston\b.{0,40}\b(wv|west virginia)\b", "WV"),
+    (r"\bcharleston\b.{0,40}\b(sc|south carolina)\b", "SC"),
+]
 
 
 def classify_urgency(title: str, summary: str) -> str:
@@ -85,16 +92,26 @@ def detect_regions(text: str) -> list[dict]:
             found.append({"state": abbr, "region": STATE_TO_REGION[abbr]})
             seen_states.add(abbr)
 
-    # Check state abbreviations (with word boundaries)
+    # Check state abbreviations (with word boundaries), case-insensitive.
     for region, states in TERRITORY_REGIONS.items():
         for state in states:
             if state in EXCLUDED_STATES or state in seen_states:
                 continue
-            if re.search(rf'\b{state}\b', text):
+            if re.search(rf"\b{re.escape(state)}\b", text, flags=re.IGNORECASE):
                 found.append({"state": state, "region": region})
                 seen_states.add(state)
 
-    # Check city names
+    # Check explicit disambiguation patterns first (e.g., "Charleston, WV")
+    for pattern, state in CITY_STATE_PATTERNS:
+        if state in EXCLUDED_STATES or state in seen_states:
+            continue
+        if state not in STATE_TO_REGION:
+            continue
+        if re.search(pattern, text_lower):
+            found.append({"state": state, "region": STATE_TO_REGION[state]})
+            seen_states.add(state)
+
+    # Check city names using unique city->state mapping
     for city, state in CITY_TO_STATE.items():
         if state in EXCLUDED_STATES or state in seen_states:
             continue

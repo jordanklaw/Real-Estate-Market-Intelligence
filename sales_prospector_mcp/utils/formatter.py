@@ -1,6 +1,12 @@
 """Output formatting utilities for all tools."""
 
+import re
 from datetime import datetime
+
+
+def _md_bold_to_html(text: str) -> str:
+    """Convert **bold** markdown to <strong> HTML tags."""
+    return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
 
 
 def format_news_brief(articles: list[dict]) -> str:
@@ -268,11 +274,11 @@ def format_daily_brief_html(
         if brief.get("talking_points"):
             html += '<p><strong>Talking Points:</strong></p>\n<ul>\n'
             for point in brief["talking_points"]:
-                html += f'<li class="talking-point">{point}</li>\n'
+                html += f'<li class="talking-point">{_md_bold_to_html(point)}</li>\n'
             html += '</ul>\n'
 
         if brief.get("yardi_angle"):
-            html += f'<div class="product-angle"><strong>Yardi Product Angle:</strong> {brief["yardi_angle"]}</div>\n'
+            html += f'<div class="product-angle"><strong>Yardi Product Angle:</strong> {_md_bold_to_html(brief["yardi_angle"])}</div>\n'
 
         html += '</div>\n'
 

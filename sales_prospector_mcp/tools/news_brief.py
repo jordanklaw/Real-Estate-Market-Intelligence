@@ -1,11 +1,16 @@
 """Tool 1: Sales News Brief - scrapes MHN and CPE, categorizes articles."""
 
+import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 from sales_prospector_mcp.config import DATA_DIR, NEWS_CACHE_MAX_AGE_HOURS, EXCLUDED_STATES
-from sales_prospector_mcp.utils.web_scraper import scrape_news_sources
+from sales_prospector_mcp.utils.web_scraper import (
+    scrape_all_sources,
+    classify_urgency,
+    detect_regions,
+)
 from sales_prospector_mcp.utils.formatter import format_news_brief
 
 CACHE_FILE = DATA_DIR / "news_cache.json"
@@ -75,8 +80,25 @@ async def sales_news_brief(refresh: bool = False) -> str:
         brief = format_news_brief(articles)
         return brief + "\n\n*Using cached data. Set refresh=true to force update.*"
 
-    # Scrape fresh articles
-    articles = await scrape_news_sources()
+    # Scrape fresh articles (sync scraper, run in thread to avoid blocking)
+    scrape_results = await asyncio.to_thread(scrape_all_sources)
+    articles = []
+    for r in scrape_results:
+        for a in r.articles:
+            text = f"{a.title} {a.snippet}"
+            regions = detect_regions(text)
+            urgency = classify_urgency(a.title, a.snippet)
+            articles.append({
+                "source": r.source_name,
+                "source_name": r.source_name,
+                "title": a.title,
+                "url": a.url,
+                "summary": a.snippet,
+                "date": "",
+                "regions": regions,
+                "urgency": urgency,
+                "scraped_at": a.scraped_at,
+            })
     articles = _filter_excluded_states(articles)
 
     # Update cache

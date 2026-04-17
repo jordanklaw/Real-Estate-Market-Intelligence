@@ -56,12 +56,12 @@ The system is structured in five layers, each depending only on the layers benea
 
 ## Prerequisites
 
-Python 3.11 or higher and Ollama must be installed on the host machine. The default model is Qwen3 14B, which requires approximately 10GB of RAM at Q4 quantization. A machine with 16GB RAM runs this comfortably.
+Python 3.11 or higher and Ollama must be installed on the host machine. The default model is Qwen3 1.7B, which requires approximately (x)GB of RAM at Q4 quantization. A machine with 16GB RAM runs this at tolerable speed.
 
 Install Ollama from [ollama.com](https://ollama.com) and pull the model:
 
 ```bash
-ollama pull qwen3:14b
+ollama pull qwen3:1.7b
 ```
 
 ## Installation
@@ -183,7 +183,7 @@ Real-Estate-Market-Intelligence/
 
 ## Stack
 
-Python 3.11, FastMCP, Model Context Protocol, Ollama, Qwen3 14B, Ubuntu 24.04 LTS, Gmail API, BeautifulSoup4, httpx, cron.
+Python 3.11, FastMCP, Model Context Protocol, Ollama, Qwen3 1.7B, Ubuntu 24.04 LTS, Gmail API, BeautifulSoup4, httpx, cron.
 
 ## License
 

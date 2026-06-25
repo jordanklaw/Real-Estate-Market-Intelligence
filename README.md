@@ -114,7 +114,7 @@ Config file location:
 
 OpenAI adopted MCP in March 2025. In ChatGPT Desktop, navigate to Settings and add an MCP server with the same command and args shown above. Consult [OpenAI's MCP documentation](https://platform.openai.com/docs) for the latest configuration format.
 
-### Cursor / Windsurf / VS Code
+### Cursor / VS Code
 
 These IDEs support MCP through their settings or extension configuration. Point the MCP server config to the same Python binary and module entry point. Each IDE's documentation covers the specific JSON structure.
 
